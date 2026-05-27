@@ -1,0 +1,119 @@
+<group name="access_management,">
+
+  <!-- ========================================================= -->
+  <!-- 1. GESTIÓN DE USUARIOS Y PERMISOS                         -->
+  <!-- ========================================================= -->
+
+  <!-- Creación de usuario (Windows – EventID 4720) -->
+  <rule id="300100" level="7">
+    <field name="win.system.eventID">4720</field>
+    <description>Windows: Creación de una nueva cuenta de usuario</description>
+    <group>windows,account_management,user_creation</group>
+  </rule>
+
+  <!-- Eliminación de usuario (Windows – EventID 4726) -->
+  <rule id="300101" level="7">
+    <field name="win.system.eventID">4726</field>
+    <description>Windows: Eliminación de una cuenta de usuario</description>
+    <group>windows,account_management,user_deletion</group>
+  </rule>
+
+  <!-- ========================================================= -->
+  <!-- 2. CAMBIOS DE PERMISOS (ALTA / BAJA / MODIFICACIÓN)       -->
+  <!-- ========================================================= -->
+
+  <!-- Usuario agregado a grupo privilegiado (Windows – 4728) -->
+  <rule id="300110" level="10">
+    <field name="win.system.eventID">4728</field>
+    <description>Windows: Usuario agregado a un grupo privilegiado</description>
+    <group>windows,privilege_escalation,group_change</group>
+  </rule>
+
+  <!-- Usuario removido de grupo privilegiado (Windows – 4729) -->
+  <rule id="300111" level="8">
+    <field name="win.system.eventID">4729</field>
+    <description>Windows: Usuario removido de un grupo privilegiado</description>
+    <group>windows,privilege_escalation,group_change</group>
+  </rule>
+
+  <!-- Uso de sudo (Linux) -->
+  <rule id="300200" level="7">
+    <if_group>sudo</if_group>
+    <match>COMMAND=</match>
+    <description>Linux: Uso de sudo detectado</description>
+    <group>linux,privilege_escalation</group>
+  </rule>
+
+  <!-- ========================================================= -->
+  <!-- 3. ACCESOS VÁLIDOS E INVÁLIDOS                            -->
+  <!-- ========================================================= -->
+
+  <!-- Login fallido (Windows – 4625) -->
+  <rule id="300300" level="5">
+    <field name="win.system.eventID">4625</field>
+    <description>Windows: Intento de inicio de sesión fallido</description>
+    <group>windows,authentication,failed_login</group>
+  </rule>
+
+  <!-- Fuerza bruta Windows -->
+  <rule id="300301" level="10">
+    <if_matched_sid>300300</if_matched_sid>
+    <frequency>5</frequency>
+    <timeframe>120</timeframe>
+    <description>Windows: Posible ataque de fuerza bruta (5 fallos en 2 minutos)</description>
+    <group>authentication,bruteforce</group>
+  </rule>
+
+  <!-- Login exitoso remoto (Windows – LogonType 10) -->
+  <rule id="300310" level="7">
+    <field name="win.system.eventID">4624</field>
+    <match>Logon Type:\s*10</match>
+    <description>Windows: Inicio de sesión remoto exitoso</description>
+    <group>windows,authentication,remote_access</group>
+  </rule>
+
+  <!-- SSH fallido (Linux) -->
+  <rule id="300400" level="5">
+    <if_group>sshd</if_group>
+    <match>Failed password for</match>
+    <description>Linux: Intento de autenticación SSH fallido</description>
+    <group>linux,authentication,failed_login</group>
+  </rule>
+
+  <!-- Fuerza bruta SSH -->
+  <rule id="300401" level="10">
+    <if_matched_sid>300400</if_matched_sid>
+    <frequency>5</frequency>
+    <timeframe>120</timeframe>
+    <description>Linux: Posible ataque de fuerza bruta SSH (5 fallos en 2 minutos)</description>
+    <group>linux,authentication,bruteforce</group>
+  </rule>
+
+  <!-- Login SSH exitoso -->
+  <rule id="300402" level="5">
+    <if_group>sshd</if_group>
+    <match>Accepted password for</match>
+    <description>Linux: Inicio de sesión SSH exitoso</description>
+    <group>linux,authentication,successful_login</group>
+  </rule>
+
+  <!-- ========================================================= -->
+  <!-- 4. DETECCIÓN DE ACTIVIDAD SOSPECHOSA                      -->
+  <!-- ========================================================= -->
+
+  <!-- Actividad de cuenta deshabilitada (Windows – 4625 + status) -->
+  <rule id="300500" level="10">
+    <field name="win.system.eventID">4625</field>
+    <match>Status:\s*0xC0000072</match>
+    <description>Windows: Intento de inicio de sesión con cuenta deshabilitada</description>
+    <group>windows,authentication,disabled_account</group>
+  </rule>
+
+  <!-- Elevación de privilegios (Windows – 4672) -->
+  <rule id="300510" level="8">
+    <field name="win.system.eventID">4672</field>
+    <description>Windows: Asignación de privilegios especiales a un nuevo inicio de sesión</description>
+    <group>windows,privilege_escalation</group>
+  </rule>
+
+</group>
