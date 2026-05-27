@@ -1,0 +1,115 @@
+<Sysmon schemaversion="4.82">
+  <HashAlgorithms>sha256</HashAlgorithms>
+  <EventFiltering>
+
+    <!-- ========================================================= -->
+    <!-- 1. PROCESOS RELACIONADOS A AUTENTICACIÓN Y ACCESOS        -->
+    <!-- ========================================================= -->
+
+    <!-- Monitorear ejecución de herramientas administrativas -->
+    <ProcessCreate onmatch="include">
+      <Image condition="contains">cmd.exe</Image>
+      <Image condition="contains">powershell.exe</Image>
+      <Image condition="contains">pwsh.exe</Image>
+      <Image condition="contains">mmc.exe</Image>
+      <Image condition="contains">taskmgr.exe</Image>
+      <Image condition="contains">reg.exe</Image>
+      <Image condition="contains">net.exe</Image>
+      <Image condition="contains">net1.exe</Image>
+      <Image condition="contains">psexec.exe</Image>
+      <Image condition="contains">runas.exe</Image>
+    </ProcessCreate>
+
+    <!-- ========================================================= -->
+    <!-- 2. CAMBIOS DE USUARIOS Y GRUPOS (NET.EXE / NET1.EXE)      -->
+    <!-- ========================================================= -->
+
+    <ProcessCreate onmatch="include">
+      <CommandLine condition="contains">net user</CommandLine>
+      <CommandLine condition="contains">net localgroup</CommandLine>
+      <CommandLine condition="contains">net group</CommandLine>
+    </ProcessCreate>
+
+    <!-- ========================================================= -->
+    <!-- 3. ACCESOS REMOTOS (RDP / WINRM)                          -->
+    <!-- ========================================================= -->
+
+    <!-- RDP -->
+    <NetworkConnect onmatch="include">
+      <DestinationPort condition="is">3389</DestinationPort>
+    </NetworkConnect>
+
+    <!-- WinRM -->
+    <NetworkConnect onmatch="include">
+      <DestinationPort condition="is">5985</DestinationPort>
+      <DestinationPort condition="is">5986</DestinationPort>
+    </NetworkConnect>
+
+    <!-- ========================================================= -->
+    <!-- 4. CAMBIOS EN POLÍTICAS DE SEGURIDAD                      -->
+    <!-- ========================================================= -->
+
+    <FileCreate onmatch="include">
+      <TargetFilename condition="contains">\\Windows\\System32\\GroupPolicy</TargetFilename>
+      <TargetFilename condition="contains">\\Windows\\System32\\GroupPolicyUsers</TargetFilename>
+    </FileCreate>
+
+    <!-- ========================================================= -->
+    <!-- 5. MODIFICACIONES EN REGISTRO RELACIONADAS A ACCESOS      -->
+    <!-- ========================================================= -->
+
+    <RegistryEvent onmatch="include">
+      <!-- RDP habilitado/deshabilitado -->
+      <TargetObject condition="contains">HKLM\System\CurrentControlSet\Control\Terminal Server</TargetObject>
+
+      <!-- Winlogon settings -->
+      <TargetObject condition="contains">HKLM\Software\Microsoft\Windows NT\CurrentVersion\Winlogon</TargetObject>
+
+      <!-- Autenticación y credenciales -->
+      <TargetObject condition="contains">HKLM\System\CurrentControlSet\Control\Lsa</TargetObject>
+    </RegistryEvent>
+
+    <!-- ========================================================= -->
+    <!-- 6. MONITOREO DE EJECUCIÓN DE COMANDOS CRÍTICOS            -->
+    <!-- ========================================================= -->
+
+    <ProcessCreate onmatch="include">
+      <CommandLine condition="contains">whoami</CommandLine>
+      <CommandLine condition="contains">query user</CommandLine>
+      <CommandLine condition="contains">qwinsta</CommandLine>
+      <CommandLine condition="contains">netstat</CommandLine>
+      <CommandLine condition="contains">dsquery</CommandLine>
+      <CommandLine condition="contains">dsget</CommandLine>
+    </ProcessCreate>
+
+    <!-- ========================================================= -->
+    <!-- 7. MONITOREO DE SERVICIOS RELACIONADOS A ACCESOS          -->
+    <!-- ========================================================= -->
+
+    <ServiceStateChange onmatch="include">
+      <Image condition="contains">TermService</Image> <!-- RDP -->
+      <Image condition="contains">WinRM</Image>
+      <Image condition="contains">LanmanServer</Image>
+      <Image condition="contains">LanmanWorkstation</Image>
+    </ServiceStateChange>
+
+    <!-- ========================================================= -->
+    <!-- 8. DETECCIÓN DE ACTIVIDAD SOSPECHOSA                      -->
+    <!-- ========================================================= -->
+
+    <!-- Ejecución desde ubicaciones inusuales -->
+    <ProcessCreate onmatch="include">
+      <Image condition="contains">C:\Users\Public\</Image>
+      <Image condition="contains">C:\Temp\</Image>
+      <Image condition="contains">AppData\Local\Temp</Image>
+    </ProcessCreate>
+
+    <!-- Scripts sospechosos -->
+    <ProcessCreate onmatch="include">
+      <CommandLine condition="contains">.ps1</CommandLine>
+      <CommandLine condition="contains">.vbs</CommandLine>
+      <CommandLine condition="contains">.js</CommandLine>
+    </ProcessCreate>
+
+  </EventFiltering>
+</Sysmon>
