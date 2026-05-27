@@ -33,3 +33,11 @@ https://<IP-del-servidor>
 
 Usuario por defecto:
 admin
+```
+---
+4. Verificar servicios
+```bash
+systemctl status wazuh-manager
+systemctl status wazuh-indexer
+systemctl status wazuh-dashboard
+
