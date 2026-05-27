@@ -1,0 +1,124 @@
+###############################
+# AUDITD RULES – ACCESS MONITORING
+# Gestión y Seguimiento de Accesos
+###############################
+
+# =============================
+# 1. AUTENTICACIÓN (SSH, LOGIN)
+# =============================
+
+# Log SSH authentication events
+-w /var/log/auth.log -p wa -k auth_logs
+
+# Monitor SSH configuration changes
+-w /etc/ssh/sshd_config -p wa -k ssh_config_change
+
+# Monitor login/logout events
+-w /var/run/utmp -p wa -k session
+-w /var/log/wtmp -p wa -k session
+-w /var/log/btmp -p wa -k failed_logins
+
+# =============================
+# 2. GESTIÓN DE USUARIOS
+# =============================
+
+# Monitor /etc/passwd changes (user creation/deletion)
+-w /etc/passwd -p wa -k user_changes
+
+# Monitor /etc/shadow changes (password changes)
+-w /etc/shadow -p wa -k shadow_changes
+
+# Monitor /etc/group changes (group modifications)
+-w /etc/group -p wa -k group_changes
+
+# Monitor /etc/gshadow changes
+-w /etc/gshadow -p wa -k gshadow_changes
+
+# =============================
+# 3. SUDO & PRIVILEGE ESCALATION
+# =============================
+
+# Monitor sudoers file
+-w /etc/sudoers -p wa -k sudoers_changes
+-w /etc/sudoers.d/ -p wa -k sudoers_changes
+
+# Monitor sudo command executions
+-a always,exit -F arch=b64 -S execve -C uid!=euid -k sudo_exec
+-a always,exit -F arch=b32 -S execve -C uid!=euid -k sudo_exec
+
+# =============================
+# 4. CAMBIOS DE PERMISOS Y PROPIETARIOS
+# =============================
+
+# Monitor chmod, chown, chgrp
+-a always,exit -F arch=b64 -S chmod,chown,fchmod,fchmodat -k perm_changes
+-a always,exit -F arch=b32 -S chmod,chown,fchmod,fchmodat -k perm_changes
+
+# =============================
+# 5. ARCHIVOS SENSIBLES
+# =============================
+
+# Monitor access to /etc/securetty
+-w /etc/securetty -p wa -k securetty_changes
+
+# Monitor PAM configuration
+-w /etc/pam.d/ -p wa -k pam_changes
+
+# Monitor login definitions
+-w /etc/login.defs -p wa -k login_defs_changes
+
+# =============================
+# 6. ACTIVIDAD SOSPECHOSA
+# =============================
+
+# Monitor execution of binaries in /usr/bin and /bin
+-w /bin/ -p x -k bin_exec
+-w /usr/bin/ -p x -k usrbin_exec
+
+# Monitor access to root home directory
+-w /root/ -p wa -k root_access
+
+# Monitor modifications to cron jobs
+-w /etc/crontab -p wa -k cron_changes
+-w /etc/cron.d/ -p wa -k cron_changes
+-w /etc/cron.daily/ -p wa -k cron_changes
+-w /etc/cron.hourly/ -p wa -k cron_changes
+
+# =============================
+# 7. KERNEL & SECURITY SETTINGS
+# =============================
+
+# Monitor sysctl changes
+-w /etc/sysctl.conf -p wa -k sysctl_changes
+-w /etc/sysctl.d/ -p wa -k sysctl_changes
+
+# Monitor SELinux (if enabled)
+-w /etc/selinux/ -p wa -k selinux_changes
+
+# =============================
+# 8. COMANDOS CRÍTICOS
+# =============================
+
+# Monitor execution of critical binaries
+-w /usr/bin/passwd -p x -k passwd_exec
+-w /usr/bin/su -p x -k su_exec
+-w /usr/bin/sudo -p x -k sudo_exec
+-w /usr/bin/chsh -p x -k chsh_exec
+-w /usr/bin/chfn -p x -k chfn_exec
+
+# =============================
+# 9. NETWORK & FIREWALL
+# =============================
+
+# Monitor firewall changes
+-w /etc/ufw/ -p wa -k firewall_changes
+-w /etc/firewalld/ -p wa -k firewall_changes
+
+# Monitor network configuration
+-w /etc/network/ -p wa -k network_changes
+-w /etc/hosts -p wa -k hosts_changes
+-w /etc/resolv.conf -p wa -k dns_changes
+
+###############################
+# END OF AUDITD RULESET
+###############################
