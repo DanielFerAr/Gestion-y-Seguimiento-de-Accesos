@@ -35,7 +35,7 @@ Usuario por defecto:
 admin
 ```
 ---
-4. Verificar servicios
+## 4. Verificar servicios
 ```bash
 systemctl status wazuh-manager
 systemctl status wazuh-indexer
