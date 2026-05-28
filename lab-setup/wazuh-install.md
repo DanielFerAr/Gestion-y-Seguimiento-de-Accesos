@@ -40,4 +40,7 @@ admin
 systemctl status wazuh-manager
 systemctl status wazuh-indexer
 systemctl status wazuh-dashboard
-
+```
+---
+## Resultado
+Wazuh queda instalado y listo para recibir logs de Windows y Linux.
