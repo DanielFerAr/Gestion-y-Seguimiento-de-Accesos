@@ -40,7 +40,9 @@ Agents → Status → Active
 
 ## 5. Instalar Sysmon
 Sysmon se instala siguiendo el archivo `sysmon-setup.md.`
+
 ---
+
 ## Resultado
 El endpoint Windows queda listo para enviar:
 - Event Logs (4624, 4625, 4672, 4720, 4726, 4728)
