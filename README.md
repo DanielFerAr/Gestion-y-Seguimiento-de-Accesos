@@ -39,8 +39,11 @@ Este laboratorio se enfoca en la **auditoría**, correlación y detección de ev
 La arquitectura completa se encuentra en:
 
 📄 `/architecture/architecture.md`  
+
 📄 `/architecture/components.md`  
+
 📄 `/architecture/architecture-diagram.mmd`  
+
 📄 `/architecture/data-flow.mmd`
 
 ### Resumen visual
@@ -82,7 +85,9 @@ Ejemplo incluido en el README:
 Los casos de uso completos están en:
 
 📄 `/use-cases/windows-access-cases.md ` 
+
 📄 `/use-cases/linux-access-cases.md ` 
+
 📄 `/use-cases/ad-access-cases.md `
 
 Incluyen:
@@ -101,8 +106,11 @@ Incluyen:
 Los incidentes completos están en:
 
 📄 `/incidents/brute-force-windows.md ` 
+
 📄 `/incidents/brute-force-ssh.md `
+
 📄 `/incidents/privilege-escalation.md ` 
+
 📄 `/incidents/remote-login.md `
  
 Incluyen:
@@ -118,8 +126,11 @@ Incluyen:
 Toda la configuración está en:
 
 📄 `/lab-setup/wazuh-install.md `  
+
 📄 `/lab-setup/windows-agent-setup.md ` 
+
 📄 `/lab-setup/linux-agent-setup.md `  
+
 📄 `/lab-setup/sysmon-setup.md `
 
 Incluye:
